@@ -1,5 +1,8 @@
 package edu.wofford;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This class provides implements a game board for Connect Four.
@@ -23,7 +26,6 @@ package edu.wofford;
  * is filled with no winning condition. If the game is still
  * ongoing, the result should be NONE.
  */
- 
 public class ConnectFour {
 
     public enum Location {EMPTY, RED, BLACK};
@@ -112,9 +114,18 @@ public class ConnectFour {
      * @return the top of the column
      */
     public Location getTopOfColumn(int column) {
-        // Question 1
-        // TODO
-        
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if(j != column){
+                    continue;
+                }
+                else{
+                    if(board[i][j] != Location.EMPTY){
+                        return board[i][j];
+                    }
+                }
+            }
+        }
         return Location.EMPTY;
     }
     
@@ -127,10 +138,7 @@ public class ConnectFour {
      * @return the height of the column
      */
     public int getHeightOfColumn(int column) {
-        // Question 2
-        // TODO
-        
-        return 0;
+        return getColumnAsString(column).length();
     }
     
     /**
@@ -144,9 +152,17 @@ public class ConnectFour {
      * @param column the column for the token
      */
     public void dropToken(int column) {
-        // Question 3
-        // TODO
-        
+        int height = getHeightOfColumn(column);
+        int toDrop = Math.abs(height-5);
+        if(column < 0 || column > 6){
+            return;
+        }
+        else if(height == 6){
+            throw new ColumnFullException();
+        }
+        board[toDrop][column] = (redTurn) ? Location.RED : Location.BLACK; 
+        redTurn = !redTurn;
+
     }
     
     /**
@@ -169,8 +185,14 @@ public class ConnectFour {
         //       this class to determine whether someone has won 
         //       along a column.
         
-        // TODO
-        
+        for (int i = 0; i < 6; i++) {
+            String col = getColumnAsString(i);
+            List<String> stringList = Arrays.asList(col.split(""));
+            if(stringList.size() == 6){
+                List<String> winner = stringList.stream().distinct().toList();
+                return (winner.get(0).equals("R")) ? Result.REDWIN : Result.BLACKWIN;
+            }
+        }
         return Result.NONE;
     }
     
@@ -191,10 +213,24 @@ public class ConnectFour {
      * @return a string representing the board
      */
     public String toString() {
-        // Question 5
-        // TODO
-        
-        return "";
+        StringBuilder sb = new StringBuilder();
+        String[][] col = new String[6][7];
+        for (int k = 0; k < col.length; k++) {
+            col[k] = new String[]{" ", " ", " ", " ", " ", " ", " "};
+            String[] split = getColumnAsString(k).split("");
+            for (int v = 0; v < split.length; v++) {   
+                col[k][v] = split[v];
+            }
+        }
+        for (int i = 6; i >= 0; i--) {
+            for (int j = 5; j >= 0; j--) {
+                sb.append("|" + col[j][i]);
+            }
+            sb.append("|\n");
+        }
+        sb.append("---------------\n");
+        System.out.println(sb);
+        return (sb.toString().length() > 0) ? sb.toString() : "";
     }
 
 
